@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grenade Lineup Creator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+:root {
+    --bg-color: #0d1117;
+    --panel-bg: rgba(22, 27, 34, 0.6);
+    --panel-border: rgba(255, 255, 255, 0.08);
+    --primary: #58a6ff;
+    --primary-hover: #3182ce;
+    --text-main: #c9d1d9;
+    --text-muted: #8b949e;
+    --input-bg: rgba(1, 4, 9, 0.8);
+    --input-border: rgba(255, 255, 255, 0.1);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    overflow-x: hidden;
+    padding: 40px 20px;
+}
+
+.background-blobs {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    z-index: -1;
+    overflow: hidden;
+}
+
+.blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(100px);
+    opacity: 0.15;
+    animation: float 10s ease-in-out infinite;
+}
+
+.blob-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: #6e40c9; animation-delay: 0s; }
+.blob-2 { bottom: -20%; right: -10%; width: 600px; height: 600px; background: #58a6ff; animation-delay: -5s; }
+
+@keyframes float {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(30px, -50px); }
+}
+
+.container {
+    width: 100%;
+    max-width: 800px;
+    z-index: 1;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 30px;
+    text-align: center;
+    color: #fff;
+}
+
+header h1 span {
+    color: var(--primary);
+}
+
+.glass-panel {
+    background: var(--panel-bg);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--panel-border);
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+    border-bottom: 1px solid var(--panel-border);
+    padding-bottom: 15px;
+}
+
+.tab-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 8px 16px;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.tab-btn:hover {
+    color: var(--text-main);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.tab-btn.active {
+    color: #fff;
+    background: rgba(88, 166, 255, 0.15);
+    box-shadow: 0 0 10px rgba(88, 166, 255, 0.1);
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: var(--text-muted);
+}
+
+input, select, textarea {
+    width: 100%;
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    color: #fff;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.2s;
+    outline: none;
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
+}
+
+textarea { resize: vertical; }
+
+.multi-input {
+    display: flex;
+    gap: 10px;
+}
+
+.submit-btn {
+    width: 100%;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    padding: 14px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    margin-top: 10px;
+}
+
+.submit-btn:hover {
+    background: var(--primary-hover);
+}
+
+.submit-btn:active {
+    transform: scale(0.98);
+}
+
+.submit-btn.secondary {
+    background: #238636;
+}
+.submit-btn.secondary:hover {
+    background: #2ea043;
+}
+
+#status-message, #json-status-message {
+    margin-top: 15px;
+    text-align: center;
+    font-size: 0.875rem;
+    min-height: 20px;
+}
+
+.success { color: #3fb950; }
+.error { color: #f85149; }
+
+.json-editor-panel {
+    display: flex;
+    flex-direction: column;
+    height: 600px;
+}
+.panel-desc { margin-bottom: 10px; color: var(--text-muted); font-size: 0.9rem; }
+
+#json-editor {
+    flex-grow: 1;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 0.9rem;
+    white-space: pre;
+    margin-bottom: 15px;
+    background: #0d1117;
+    border: 1px solid #30363d;
+}
+
+/* List view */
+.map-category { margin-bottom: 30px; }
+.map-title {
+    font-size: 1.2rem;
+    color: var(--primary);
+    margin-bottom: 15px;
+    border-bottom: 1px solid var(--panel-border);
+    padding-bottom: 5px;
+}
+.nade-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--panel-border);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 10px;
+}
+.nade-header {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
+}
+.nade-title { font-weight: 600; font-size: 1.1rem; color: #fff; }
+.nade-type { font-size: 0.8rem; background: rgba(88,166,255,0.2); color: var(--primary); padding: 4px 8px; border-radius: 4px; border: 1px solid rgba(88,166,255,0.3); }
+.nade-desc { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 10px; }
+.nade-details {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.85rem; color: #aaa;
+    background: rgba(0,0,0,0.3); padding: 10px; border-radius: 6px;
+}
+.detail-item span { color: #fff; font-family: monospace; }
+
+.connection-status {
+    text-align: center;
+    padding: 8px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+.connection-status.connected {
+    background: rgba(63, 185, 80, 0.15);
+    color: #3fb950;
+    border: 1px solid rgba(63, 185, 80, 0.3);
+}
+.connection-status.disconnected {
+    background: rgba(248, 81, 73, 0.15);
+    color: #f85149;
+    border: 1px solid rgba(248, 81, 73, 0.3);
+}
+
+.live-data-panel {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 20px;
+    font-size: 0.85rem;
+}
+.live-data-panel h4 {
+    color: var(--primary);
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.live-data-panel h4 .live-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #f85149;
+    display: inline-block;
+    margin-right: 6px;
+    animation: pulse-dot 1.5s ease-in-out infinite;
+}
+.live-data-panel h4 .live-dot.active {
+    background: #3fb950;
+}
+@keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+.live-data-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+.live-data-item {
+    color: var(--text-muted);
+}
+.live-data-item span {
+    color: #fff;
+    font-family: monospace;
+    font-size: 0.8rem;
+}
+.auto-fill-btn {
+    width: 100%;
+    background: rgba(88, 166, 255, 0.1);
+    border: 1px solid rgba(88, 166, 255, 0.3);
+    color: var(--primary);
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 10px;
+}
+.auto-fill-btn:hover {
+    background: rgba(88, 166, 255, 0.2);
+}
+.auto-fill-btn.active {
+    background: rgba(63, 185, 80, 0.15);
+    border-color: rgba(63, 185, 80, 0.4);
+    color: #3fb950;
+}
+    </style>
+</head>
+<body>
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>Lineup <span>Creator</span></h1>
+        </header>
+        
+        <div class="app-layout">
+            <div class="sidebar glass-panel">
+                <div id="connection-status" class="connection-status disconnected">Checking FC2 connection...</div>
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="create">Create</button>
+                    <button class="tab-btn" data-tab="view">JSON Editor</button>
+                    <button class="tab-btn" data-tab="list">View All</button>
+                </div>
+                
+                <form id="lineup-form" class="tab-content active" data-content="create">
+                    <div class="form-group">
+                        <label for="map">Map</label>
+                        <input type="text" id="map" placeholder="e.g. de_mirage" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="grenade_type">Grenade Type</label>
+                        <select id="grenade_type" required>
+                            <option value="smoke_grenade">Smoke Grenade</option>
+                            <option value="flashbang">Flashbang</option>
+                            <option value="he_grenade">HE Grenade</option>
+                            <option value="molotov">Molotov / Incendiary</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="title">Title</label>
+                        <input type="text" id="title" placeholder="e.g. Stairs Smoke" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea id="description" rows="3" placeholder="Additional details..." required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="throw_type">Throw Type</label>
+                        <select id="throw_type" required>
+                            <option value="jump_throw">Jump Throw</option>
+                            <option value="crouch_throw">Crouch Throw</option>
+                            <option value="crouch_jump_throw">Crouch Jump Throw</option>
+                            <option value="w_jump_throw">W Jump Throw</option>
+                            <option value="w_shift_jumpthrow">W Shift Jump Throw</option>
+                            <option value="shiftwalk_jumpthrow">Shift Walk Jump Throw</option>
+                        </select>
+                    </div>
+
+                    <div class="live-data-panel">
+                        <h4><span><span class="live-dot" id="live-dot"></span> Live Game Data</span></h4>
+                        <div class="live-data-grid">
+                            <div class="live-data-item">Map: <span id="live-map">—</span></div>
+                            <div class="live-data-item">Weapon: <span id="live-weapon">—</span></div>
+                            <div class="live-data-item">Angles: <span id="live-angles">—</span></div>
+                            <div class="live-data-item">Position: <span id="live-pos">—</span></div>
+                        </div>
+                        <button type="button" id="auto-fill-btn" class="auto-fill-btn">⚡ Fill Form with Live Data</button>
+                    </div>
+
+                    <div class="vector-inputs">
+                        <div class="form-group">
+                            <label>View Angle (X, Y)</label>
+                            <div class="multi-input">
+                                <input type="number" step="any" id="view_angle_x" placeholder="Pitch (X)" required>
+                                <input type="number" step="any" id="view_angle_y" placeholder="Yaw (Y)" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Position Vector (X, Y, Z)</label>
+                            <div class="multi-input">
+                                <input type="number" step="any" id="pos_x" placeholder="X" required>
+                                <input type="number" step="any" id="pos_y" placeholder="Y" required>
+                                <input type="number" step="any" id="pos_z" placeholder="Z" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit-btn">Save Lineup</button>
+                    <div id="status-message"></div>
+                </form>
+
+                <div class="tab-content json-editor-panel" data-content="view">
+                    <p class="panel-desc">Raw grenades.json</p>
+                    <textarea id="json-editor" spellcheck="false"></textarea>
+                    <button id="save-json-btn" class="submit-btn secondary">Save JSON</button>
+                    <div id="json-status-message"></div>
+                </div>
+
+                <div class="tab-content" data-content="list">
+                    <div id="visual-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    const NODE_BASE = window.location.origin; // Node.js server serves this page
+    let latestPlayerData = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const tabs = document.querySelectorAll('.tab-btn');
+        const contents = document.querySelectorAll('.tab-content');
+        const form = document.getElementById('lineup-form');
+        const jsonEditor = document.getElementById('json-editor');
+        const saveJsonBtn = document.getElementById('save-json-btn');
+        const statusMsg = document.getElementById('status-message');
+        const jsonStatusMsg = document.getElementById('json-status-message');
+        const visualList = document.getElementById('visual-list');
+        const connStatus = document.getElementById('connection-status');
+        const liveDot = document.getElementById('live-dot');
+        const autoFillBtn = document.getElementById('auto-fill-btn');
+
+        // Poll player data from the Node server (Lua POSTs it there, we GET it)
+        async function pollPlayerData() {
+            try {
+                const res = await fetch(`${NODE_BASE}/?action=get_player_data`, {
+                    signal: AbortSignal.timeout(1500)
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (!data.error) {
+                        latestPlayerData = data;
+                        liveDot.classList.add('active');
+                        connStatus.textContent = '● Connected to FC2';
+                        connStatus.className = 'connection-status connected';
+
+                        // Update live display
+                        document.getElementById('live-map').textContent = data.map || '—';
+                        document.getElementById('live-weapon').textContent = data.weapon ? data.weapon.replace(/_/g, ' ') : '—';
+                        document.getElementById('live-angles').textContent = data.angles ? `${data.angles.x.toFixed(1)}, ${data.angles.y.toFixed(1)}` : '—';
+                        document.getElementById('live-pos').textContent = data.position ? `${data.position.x.toFixed(0)}, ${data.position.y.toFixed(0)}, ${data.position.z.toFixed(0)}` : '—';
+                    } else {
+                        liveDot.classList.remove('active');
+                        document.getElementById('live-map').textContent = '—';
+                        document.getElementById('live-weapon').textContent = '—';
+                        document.getElementById('live-angles').textContent = '—';
+                        document.getElementById('live-pos').textContent = '—';
+                        
+                        connStatus.textContent = '● Connected to Server (' + data.error + ')';
+                        connStatus.className = 'connection-status connected';
+                    }
+                    return;
+                }
+            } catch (e) {}
+            liveDot.classList.remove('active');
+            connStatus.textContent = '● Disconnected from FC2';
+            connStatus.className = 'connection-status disconnected';
+        }
+        pollPlayerData();
+        setInterval(pollPlayerData, 1000);
+
+        // Auto-fill button — snapshot current live data into form
+        autoFillBtn.addEventListener('click', () => {
+            if (!latestPlayerData || latestPlayerData.error) {
+                showStatus(statusMsg, 'No live data available — are you in-game?', 'error');
+                return;
+            }
+            const d = latestPlayerData;
+            if (d.map) document.getElementById('map').value = d.map;
+            if (d.weapon) {
+                const sel = document.getElementById('grenade_type');
+                const opt = Array.from(sel.options).find(o => o.value === d.weapon);
+                if (opt) opt.selected = true;
+            }
+            if (d.angles) {
+                document.getElementById('view_angle_x').value = d.angles.x;
+                document.getElementById('view_angle_y').value = d.angles.y;
+            }
+            if (d.position) {
+                document.getElementById('pos_x').value = d.position.x;
+                document.getElementById('pos_y').value = d.position.y;
+                document.getElementById('pos_z').value = d.position.z;
+            }
+            showStatus(statusMsg, 'Form filled with live data!', 'success');
+        });
+
+        // Tab Switching
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                contents.forEach(c => c.classList.remove('active'));
+                
+                tab.classList.add('active');
+                const target = tab.getAttribute('data-tab');
+                document.querySelector(`.tab-content[data-content="${target}"]`).classList.add('active');
+
+                if (target === 'view' || target === 'list') {
+                    loadJSON();
+                }
+            });
+        });
+
+        // Form Submission — save a new lineup
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const payload = {
+                map: document.getElementById('map').value,
+                grenade_type: document.getElementById('grenade_type').value,
+                title: document.getElementById('title').value,
+                description: document.getElementById('description').value,
+                throw_type: document.getElementById('throw_type').value,
+                view_angle: {
+                    x: parseFloat(document.getElementById('view_angle_x').value),
+                    y: parseFloat(document.getElementById('view_angle_y').value)
+                },
+                position: {
+                    x: parseFloat(document.getElementById('pos_x').value),
+                    y: parseFloat(document.getElementById('pos_y').value),
+                    z: parseFloat(document.getElementById('pos_z').value)
+                }
+            };
+
+            try {
+                const res = await fetch(`${NODE_BASE}/?action=save`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (res.ok) {
+                    showStatus(statusMsg, 'Lineup saved successfully!', 'success');
+                    form.reset();
+                } else {
+                    showStatus(statusMsg, 'Failed to save lineup.', 'error');
+                }
+            } catch (err) {
+                showStatus(statusMsg, 'Network error. Make sure server is running.', 'error');
+            }
+        });
+
+        // Load JSON from Node server
+        async function loadJSON() {
+            try {
+                const res = await fetch(`${NODE_BASE}/?action=load`);
+                const data = await res.json();
+                jsonEditor.value = JSON.stringify(data, null, 4);
+                renderVisualList(data);
+            } catch (err) {
+                jsonEditor.value = '{\n    "error": "Could not connect to server"\n}';
+            }
+        }
+
+        // Save edited JSON
+        saveJsonBtn.addEventListener('click', async () => {
+            try {
+                const parsed = JSON.parse(jsonEditor.value);
+                const res = await fetch(`${NODE_BASE}/?action=save_raw`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(parsed)
+                });
+                
+                if (res.ok) {
+                    showStatus(jsonStatusMsg, 'JSON updated successfully!', 'success');
+                    renderVisualList(parsed);
+                } else {
+                    showStatus(jsonStatusMsg, 'Failed to update JSON.', 'error');
+                }
+            } catch (err) {
+                showStatus(jsonStatusMsg, 'Invalid JSON format!', 'error');
+            }
+        });
+
+        function renderVisualList(data) {
+            visualList.innerHTML = '';
+            if (Object.keys(data).length === 0) {
+                visualList.innerHTML = '<p style="color:var(--text-muted); text-align:center; padding: 20px;">No lineups found.</p>';
+                return;
+            }
+
+            for (const [mapName, nades] of Object.entries(data)) {
+                const mapSection = document.createElement('div');
+                mapSection.className = 'map-category';
+                
+                const title = document.createElement('h3');
+                title.className = 'map-title';
+                title.textContent = mapName.toUpperCase();
+                mapSection.appendChild(title);
+
+                nades.forEach(nade => {
+                    const card = document.createElement('div');
+                    card.className = 'nade-card';
+                    card.innerHTML = `
+                        <div class="nade-header">
+                            <div class="nade-title">${nade.title}</div>
+                            <div class="nade-type">${nade.grenade_type.replace('_', ' ').toUpperCase()}</div>
+                        </div>
+                        <div class="nade-desc">${nade.description}</div>
+                        <div class="nade-details">
+                            <div class="detail-item">Throw: <span>${nade.throw_type.replace(/_/g, ' ')}</span></div>
+                            <div class="detail-item">Angles: <span>${nade.view_angle.x}, ${nade.view_angle.y}</span></div>
+                            <div class="detail-item" style="grid-column: span 2">Pos: <span>${nade.position.x}, ${nade.position.y}, ${nade.position.z}</span></div>
+                        </div>
+                    `;
+                    mapSection.appendChild(card);
+                });
+
+                visualList.appendChild(mapSection);
+            }
+        }
+
+        function showStatus(elem, msg, type) {
+            elem.textContent = msg;
+            elem.className = type;
+            setTimeout(() => { elem.textContent = ''; elem.className = ''; }, 3000);
+        }
+    });
+    </script>
+</body>
+</html>

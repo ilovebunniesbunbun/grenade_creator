@@ -1,0 +1,19 @@
+{
+    "de_mirage": [
+        {
+            "grenade_type": "smoke_grenade",
+            "title": "Trash -> Connector",
+            "description": "Line up on carpet and jump throw",
+            "throw_type": "jump_throw",
+            "view_angle": {
+                "x": -20.514907836914,
+                "y": -158.33770751953
+            },
+            "position": {
+                "x": 1422.7596435547,
+                "y": 36.434120178223,
+                "z": -167.96875
+            }
+        }
+    ]
+}

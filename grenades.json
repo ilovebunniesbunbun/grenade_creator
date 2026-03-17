@@ -14,6 +14,51 @@
                 "y": 36.434120178223,
                 "z": -167.96875
             }
+        },
+        {
+            "grenade_type": "smoke_grenade",
+            "title": "trash -> window",
+            "description": "tap d while jump throwing",
+            "throw_type": "d_jumpthrow",
+            "view_angle": {
+                "x": -35.794830322266,
+                "y": -163.83877563477
+            },
+            "position": {
+                "x": 1389.46875,
+                "y": 70.960014343262,
+                "z": -167.96875
+            }
+        },
+        {
+            "grenade_type": "smoke_grenade",
+            "title": "instant -> window",
+            "description": "bottom corner of facade",
+            "throw_type": "w_jump_throw",
+            "view_angle": {
+                "x": -28.912582397461,
+                "y": -165.95809936523
+            },
+            "position": {
+                "x": 1296,
+                "y": 32,
+                "z": -167.96875
+            }
+        },
+        {
+            "grenade_type": "smoke_grenade",
+            "title": "instant -> mid window",
+            "description": "line up where railing and door meet facade",
+            "throw_type": "w_jump_throw",
+            "view_angle": {
+                "x": -44.617889404297,
+                "y": -166.87408447266
+            },
+            "position": {
+                "x": 1216,
+                "y": -16,
+                "z": -163.96875
+            }
         }
     ]
 }

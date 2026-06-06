@@ -4,28 +4,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grenade Lineup Creator</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>fgrenade_helper.lua - grenade_creator</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #0d1117;
-            --panel-bg: rgba(22, 27, 34, 0.6);
-            --panel-border: rgba(255, 255, 255, 0.1);
-            --primary: #58a6ff;
-            --primary-hover: #3182ce;
-            --text-main: #c9d1d9;
-            --text-muted: #8b949e;
-            --input-bg: rgba(1, 4, 9, 0.8);
-            --input-border: rgba(255, 255, 255, 0.1);
-            --danger: #f85149;
-            --danger-hover: #ff7b72;
+            --bg-color: #08070d;
+            --panel-bg: #12101e;
+            --panel-border: #241f3d;
+            --primary: #9b66ff;
+            --primary-hover: #b388ff;
+            --text-main: #d3d1e0;
+            --text-muted: #625d80;
+            --input-bg: #07050a;
+            --input-border: #241f3d;
+            --danger: #ff6b8b;
+            --danger-hover: #ff8fa6;
+            
+            --accent-purple: #1e1833;
+            --accent-purple-border: #443775;
+            --accent-purple-text: #a899eb;
+            
+            --accent-red: #2d161d;
+            --accent-red-border: #5c2c38;
+            --accent-red-text: #ff7b72;
+            
+            --accent-green: #10261c;
+            --accent-green-border: #1f4f39;
+            --accent-green-text: #50fa7b;
+            
+            --accent-blue: #132238;
+            --accent-blue-border: #28446e;
+            --accent-blue-text: #8eaef8;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Inter', sans-serif;
+            font-family: 'JetBrains Mono', monospace;
         }
 
         body {
@@ -40,51 +56,7 @@
         }
 
         .background-blobs {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: -1;
-            overflow: hidden;
-        }
-
-        .blob {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(100px);
-            opacity: 0.15;
-            animation: float 10s ease-in-out infinite;
-        }
-
-        .blob-1 {
-            top: -10%;
-            left: -10%;
-            width: 500px;
-            height: 500px;
-            background: #6e40c9;
-            animation-delay: 0s;
-        }
-
-        .blob-2 {
-            bottom: -20%;
-            right: -10%;
-            width: 600px;
-            height: 600px;
-            background: #58a6ff;
-            animation-delay: -5s;
-        }
-
-        @keyframes float {
-
-            0%,
-            100% {
-                transform: translate(0, 0);
-            }
-
-            50% {
-                transform: translate(30px, -50px);
-            }
+            display: none;
         }
 
         .container {
@@ -94,24 +66,27 @@
         }
 
         header h1 {
-            font-size: 2.5rem;
+            font-size: 1.8rem;
             font-weight: 700;
             margin-bottom: 30px;
-            text-align: center;
+            text-align: left;
             color: #fff;
+            text-transform: lowercase;
+            border-bottom: 1px solid var(--panel-border);
+            padding-bottom: 12px;
+            letter-spacing: -0.5px;
         }
 
         header h1 span {
-            color: var(--primary);
+            color: var(--accent-purple-text);
         }
 
         .glass-panel {
             background: var(--panel-bg);
-            backdrop-filter: blur(16px);
             border: 1px solid var(--panel-border);
-            border-radius: 16px;
-            padding: 30px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border-radius: 6px;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
             margin-bottom: 25px;
         }
 
@@ -121,10 +96,11 @@
 
         .form-group label {
             display: block;
-            font-size: 0.875rem;
+            font-size: 0.8rem;
             font-weight: 500;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             color: var(--text-muted);
+            text-transform: lowercase;
         }
 
         input,
@@ -134,9 +110,10 @@
             background: var(--input-bg);
             border: 1px solid var(--input-border);
             color: #fff;
-            padding: 12px 16px;
-            border-radius: 8px;
-            font-size: 1rem;
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-family: 'JetBrains Mono', monospace;
             transition: all 0.2s;
             outline: none;
         }
@@ -144,8 +121,23 @@
         input:focus,
         select:focus,
         textarea:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
+            border-color: var(--accent-purple-border);
+            box-shadow: 0 0 0 3px rgba(155, 102, 255, 0.15);
+        }
+
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg fill='%23625d80' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 32px !important;
+            cursor: pointer;
+        }
+
+        select:focus {
+            background-image: url("data:image/svg+xml;utf8,<svg fill='%239b66ff' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
         }
 
         textarea {
@@ -159,20 +151,24 @@
 
         .submit-btn {
             width: 100%;
-            background: var(--primary);
-            color: #fff;
-            border: none;
-            padding: 14px;
-            border-radius: 8px;
-            font-size: 1rem;
+            background: var(--accent-purple);
+            color: var(--accent-purple-text);
+            border: 1px solid var(--accent-purple-border);
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
             font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            text-transform: lowercase;
             cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
+            transition: all 0.2s;
             margin-top: 10px;
         }
 
         .submit-btn:hover {
-            background: var(--primary-hover);
+            background: rgba(155, 102, 255, 0.2);
+            border-color: var(--primary);
+            color: #fff;
         }
 
         .submit-btn:active {
@@ -185,20 +181,21 @@
             font-size: 0.875rem;
             min-height: 20px;
             padding: 10px;
-            border-radius: 8px;
+            border-radius: 6px;
             transition: all 0.3s;
+            text-transform: lowercase;
         }
 
         .success {
-            background: rgba(56, 139, 253, 0.1);
-            border: 1px solid rgba(56, 139, 253, 0.2);
-            color: #58a6ff;
+            background: var(--accent-green);
+            border: 1px solid var(--accent-green-border);
+            color: var(--accent-green-text);
         }
 
         .error {
-            background: rgba(248, 81, 73, 0.1);
-            border: 1px solid rgba(248, 81, 73, 0.2);
-            color: #f85149;
+            background: var(--accent-red);
+            border: 1px solid var(--accent-red-border);
+            color: var(--accent-red-text);
         }
 
         /* List view */
@@ -208,77 +205,102 @@
             align-items: center;
             margin-top: 40px;
             margin-bottom: 20px;
+            border-bottom: 1px solid var(--panel-border);
+            padding-bottom: 10px;
         }
 
         .section-title {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             font-weight: 600;
             color: #fff;
+            text-transform: lowercase;
         }
 
         .map-category {
             margin-bottom: 12px;
-            border-radius: 12px;
+            border-radius: 6px;
             overflow: hidden;
             border: 1px solid var(--panel-border);
-            background: rgba(255, 255, 255, 0.02);
+            background: rgba(255, 255, 255, 0.01);
         }
 
         .map-header {
-            padding: 15px 20px;
-            background: rgba(255, 255, 255, 0.05);
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.02);
             cursor: pointer;
             display: flex;
             justify-content: space-between;
             align-items: center;
             transition: background 0.2s;
             user-select: none;
+            border-bottom: 1px solid var(--panel-border);
         }
 
         .map-header:hover {
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.05);
         }
 
         .map-title {
-            font-size: 1rem;
+            font-size: 0.9rem;
             font-weight: 600;
-            color: var(--primary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            color: var(--accent-purple-text);
+            text-transform: lowercase;
         }
 
         .map-count {
-            font-size: 0.8rem;
-            background: rgba(88, 166, 255, 0.1);
-            color: var(--primary);
+            font-size: 0.75rem;
+            background: var(--accent-purple);
+            color: var(--accent-purple-text);
             padding: 2px 8px;
-            border-radius: 20px;
-            border: 1px solid rgba(88, 166, 255, 0.2);
+            border-radius: 4px;
+            border: 1px solid var(--accent-purple-border);
+        }
+
+        .map-content-wrapper {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .map-category.open .map-content-wrapper {
+            grid-template-rows: 1fr;
         }
 
         .map-content {
-            display: none;
-            padding: 15px;
-            background: rgba(0, 0, 0, 0.2);
+            min-height: 0;
+            overflow: hidden;
+            padding: 0 15px;
+            background: rgba(0, 0, 0, 0.15);
+            transition: padding 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .map-category.open .map-content {
-            display: block;
+            padding: 15px;
+        }
+
+        .map-chevron {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .map-category.open .map-chevron {
+            transform: rotate(-180deg);
         }
 
         .nade-card {
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(0, 0, 0, 0.1);
             border: 1px solid var(--panel-border);
-            border-radius: 10px;
+            border-radius: 6px;
             padding: 16px;
             margin-bottom: 15px;
             position: relative;
-            transition: transform 0.2s;
+            transition: all 0.2s;
         }
 
         .nade-card:hover {
-            transform: translateY(-2px);
-            border-color: rgba(255, 255, 255, 0.15);
+            border-color: var(--accent-purple-border);
+            background: rgba(0, 0, 0, 0.2);
         }
 
         .nade-header {
@@ -286,66 +308,73 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 12px;
-            padding-right: 40px;
+            padding-right: 80px;
         }
 
         .nade-title {
             font-weight: 600;
-            font-size: 1.1rem;
+            font-size: 1rem;
             color: #fff;
+            text-transform: lowercase;
         }
 
         .nade-type {
             font-size: 0.75rem;
-            background: rgba(88, 166, 255, 0.15);
-            color: var(--primary);
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-weight: 600;
-            text-transform: uppercase;
+            background: var(--accent-purple);
+            color: var(--accent-purple-text);
+            border: 1px solid var(--accent-purple-border);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 500;
+            text-transform: lowercase;
         }
 
         .nade-desc {
             color: var(--text-muted);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             margin-bottom: 12px;
             line-height: 1.4;
+            text-transform: lowercase;
         }
 
         .nade-details {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: var(--text-muted);
-            background: rgba(0, 0, 0, 0.4);
-            padding: 12px;
-            border-radius: 8px;
+            background: var(--input-bg);
+            border: 1px solid var(--panel-border);
+            padding: 10px;
+            border-radius: 6px;
         }
 
         .detail-item strong {
-            color: var(--text-main);
+            color: var(--text-muted);
             display: block;
             font-size: 0.7rem;
-            text-transform: uppercase;
+            text-transform: lowercase;
             margin-bottom: 2px;
         }
 
         .detail-item span {
             color: #fff;
-            font-family: monospace;
+            font-family: 'JetBrains Mono', monospace;
         }
 
-        .delete-btn {
+        .nade-actions {
             position: absolute;
             top: 15px;
             right: 15px;
-            background: rgba(248, 81, 73, 0.1);
-            color: var(--danger);
-            border: 1px solid rgba(248, 81, 73, 0.2);
+            display: flex;
+            gap: 8px;
+        }
+
+        .delete-btn,
+        .edit-btn {
             width: 32px;
             height: 32px;
-            border-radius: 8px;
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -353,53 +382,75 @@
             transition: all 0.2s;
         }
 
+        .delete-btn {
+            background: var(--accent-red);
+            color: var(--accent-red-text);
+            border: 1px solid var(--accent-red-border);
+        }
+
         .delete-btn:hover {
-            background: var(--danger);
+            background: rgba(255, 123, 114, 0.15);
+            border-color: #ff7b72;
             color: #fff;
         }
 
-        .delete-btn svg {
+        .edit-btn {
+            background: var(--accent-purple);
+            color: var(--accent-purple-text);
+            border: 1px solid var(--accent-purple-border);
+        }
+
+        .edit-btn:hover {
+            background: rgba(168, 153, 235, 0.15);
+            border-color: #a899eb;
+            color: #fff;
+        }
+
+        .delete-btn svg,
+        .edit-btn svg {
             width: 18px;
             height: 18px;
         }
 
         .connection-status {
-            text-align: center;
-            padding: 10px;
+            text-align: left;
+            padding: 8px 12px;
             margin-bottom: 20px;
-            border-radius: 10px;
-            font-size: 0.85rem;
-            font-weight: 600;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
             letter-spacing: 0.3px;
+            text-transform: lowercase;
         }
 
         .connection-status.connected {
-            background: rgba(63, 185, 80, 0.1);
-            color: #3fb950;
-            border: 1px solid rgba(63, 185, 80, 0.2);
+            background: var(--accent-green);
+            color: var(--accent-green-text);
+            border: 1px solid var(--accent-green-border);
         }
 
         .connection-status.disconnected {
-            background: rgba(248, 81, 73, 0.1);
-            color: #f85149;
-            border: 1px solid rgba(248, 81, 73, 0.2);
+            background: var(--accent-red);
+            color: var(--accent-red-text);
+            border: 1px solid var(--accent-red-border);
         }
 
         .live-data-panel {
-            background: rgba(0, 0, 0, 0.4);
+            background: var(--input-bg);
             border: 1px solid var(--panel-border);
-            border-radius: 12px;
+            border-radius: 6px;
             padding: 16px;
             margin-bottom: 20px;
         }
 
         .live-data-panel h4 {
-            color: var(--primary);
-            font-size: 0.9rem;
+            color: var(--accent-purple-text);
+            font-size: 0.85rem;
             margin-bottom: 12px;
             display: flex;
             align-items: center;
             font-weight: 600;
+            text-transform: lowercase;
         }
 
         .live-data-panel h4 .live-dot {
@@ -413,11 +464,10 @@
         }
 
         .live-data-panel h4 .live-dot.active {
-            background: #3fb950;
+            background: var(--accent-green-text);
         }
 
         @keyframes pulse-dot {
-
             0%,
             100% {
                 opacity: 1;
@@ -436,32 +486,285 @@
         }
 
         .live-data-item {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: var(--text-muted);
+            text-transform: lowercase;
         }
 
         .live-data-item div {
             color: #fff;
-            font-family: monospace;
-            font-size: 0.85rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
             margin-top: 2px;
         }
 
         .auto-fill-btn {
             width: 100%;
-            background: rgba(88, 166, 255, 0.1);
-            border: 1px solid rgba(88, 166, 255, 0.2);
-            color: var(--primary);
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 0.9rem;
+            background: var(--accent-purple);
+            border: 1px solid var(--accent-purple-border);
+            color: var(--accent-purple-text);
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
             font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            text-transform: lowercase;
             cursor: pointer;
             transition: all 0.2s;
         }
 
         .auto-fill-btn:hover {
-            background: rgba(88, 166, 255, 0.15);
+            background: rgba(155, 102, 255, 0.2);
+            border-color: var(--primary);
+            color: #fff;
+        }
+
+        input[type="checkbox"] {
+            width: auto;
+            margin-right: 5px;
+            cursor: pointer;
+        }
+
+        .edit-btn:hover {
+            background: var(--primary) !important;
+            color: #fff !important;
+        }
+
+        .toggle-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--panel-border);
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s ease;
+        }
+
+        .toggle-badge:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-main);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .toggle-badge input[type="checkbox"] {
+            display: none;
+        }
+
+        .toggle-badge:has(input[type="checkbox"]:checked) {
+            background: var(--accent-purple);
+            border-color: var(--accent-purple-border);
+            color: var(--accent-purple-text);
+            box-shadow: 0 0 10px rgba(155, 102, 255, 0.1);
+        }
+
+        .unit-toggle {
+            display: inline-flex;
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid var(--panel-border);
+            border-radius: 6px;
+            padding: 2px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .unit-btn {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 4px;
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+            text-transform: lowercase;
+        }
+
+        .unit-btn:hover {
+            color: var(--text-main);
+        }
+
+        .unit-btn.active {
+            background: var(--accent-purple);
+            border: 1px solid var(--accent-purple-border);
+            color: var(--accent-purple-text);
+        }
+
+        /* Custom Dropdown / Select styling */
+        .custom-select-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .custom-select-trigger {
+            width: 100%;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            color: #fff;
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-family: 'JetBrains Mono', monospace;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+            transition: all 0.2s;
+        }
+
+        .custom-select-trigger:hover {
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .custom-select-trigger.active {
+            border-color: var(--accent-purple-border);
+            box-shadow: 0 0 0 3px rgba(155, 102, 255, 0.15);
+        }
+
+        .custom-select-trigger::after {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-right: 2px solid var(--text-muted);
+            border-bottom: 2px solid var(--text-muted);
+            transform: rotate(45deg);
+            margin-top: -5px;
+            transition: all 0.2s;
+        }
+
+        .custom-select-trigger.active::after {
+            transform: rotate(-135deg);
+            margin-top: 1px;
+            border-color: var(--primary);
+        }
+
+        .custom-select-options {
+            position: absolute;
+            top: calc(100% + 5px);
+            left: 0;
+            width: 100%;
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 6px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            z-index: 100;
+            max-height: 220px;
+            overflow-y: auto;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-5px);
+            transition: all 0.2s ease;
+        }
+
+        .custom-select-options.open {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .custom-option {
+            padding: 10px 14px;
+            font-size: 0.9rem;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all 0.15s;
+            text-transform: lowercase;
+        }
+
+        .custom-option:hover {
+            background: var(--accent-purple);
+            color: var(--accent-purple-text);
+        }
+
+        .custom-option.selected {
+            background: var(--accent-purple);
+            color: #fff;
+            border-left: 2px solid var(--primary);
+        }
+
+        /* Custom Number Input / Ticks styling */
+        .custom-number-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        .custom-number-wrapper input[type="number"] {
+            padding-right: 42px;
+            -moz-appearance: textfield;
+        }
+
+        .custom-number-wrapper input[type="number"]::-webkit-outer-spin-button,
+        .custom-number-wrapper input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .custom-number-btn-container {
+            position: absolute;
+            right: 1px;
+            top: 1px;
+            bottom: 1px;
+            width: 30px;
+            display: flex;
+            flex-direction: column;
+            border-left: 1px solid var(--input-border);
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 0 5px 5px 0;
+            overflow: hidden;
+        }
+
+        .custom-number-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            user-select: none;
+            color: var(--text-muted);
+            font-size: 0.6rem;
+            transition: all 0.15s ease;
+            background: var(--input-bg);
+        }
+
+        .custom-number-btn:hover {
+            background: var(--accent-purple);
+            color: var(--accent-purple-text);
+        }
+
+        .custom-number-btn:active {
+            background: var(--accent-purple-border);
+        }
+
+        .custom-number-btn.up {
+            border-bottom: 1px solid var(--input-border);
+        }
+
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            padding: 20px;
+        }
+
+        .modal-backdrop.open {
+            display: flex;
+            opacity: 1;
         }
     </style>
 </head>
@@ -474,7 +777,7 @@
 
     <div class="container">
         <header>
-            <h1>Lineup <span>Creator</span></h1>
+            <h1>fgrenade_helper.lua - <span>grenade_creator</span></h1>
         </header>
 
         <div id="connection-status" class="connection-status disconnected">● Disconnected from FC2</div>
@@ -496,9 +799,9 @@
                     <textarea id="description" rows="2" placeholder="Where to stand, what to aim at..."></textarea>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                    <div class="form-group">
-                        <label for="grenade_type">Grenade</label>
+                <div style="display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 20px;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="grenade_type">Grenade Type</label>
                         <select id="grenade_type" required>
                             <option value="smoke_grenade">Smoke</option>
                             <option value="flashbang">Flashbang</option>
@@ -506,33 +809,60 @@
                             <option value="molotov">Molotov</option>
                         </select>
                     </div>
+                </div>
 
-                    <div class="form-group">
-                        <label for="throw_type">Throw Type</label>
-                        <select id="throw_type" required>
-                            <option value="normal_throw">Normal</option>
-                            <option value="jump_throw">Jump</option>
-                            <option value="crouch_throw">Crouch</option>
-                            <option value="crouch_jump_throw">Crouch Jump</option>
-                            <option value="w_throw">W Throw</option>
-                            <option value="w_jump_throw">W Jump</option>
-                            <option value="w_shift_jumpthrow">W Shift Jump</option>
-                            <option value="shiftwalk_jumpthrow">Shift Walk Jump</option>
-                            <option value="d_jumpthrow">D Jump</option>
-                            <option value="a_jumpthrow">A Jump</option>
-                            <option value="s_jumpthrow">S Jump</option>
-                            <option value="right_click_throw">Right Click</option>
-                            <option value="right_click_jump_throw">Right Click Jump</option>
-                            <option value="right_click_crouch_throw">Right Click Crouch</option>
-                            <option value="right_click_crouch_jump_throw">Right Click Crouch Jump</option>
-                            <option value="middle_click_throw">Middle Click</option>
-                            <option value="middle_click_jump_throw">Middle Click Jump</option>
-                            <option value="middle_click_w_jump_throw">Middle Click W Jump</option>
-                            <option value="middle_click_crouch_throw">Middle Click Crouch</option>
-                            <option value="middle_click_crouch_jump_throw">Middle Click Crouch Jump</option>
-                            <option value="middle_click_crouch_w_jump_throw">Middle Click Crouch W Jump</option>
-                            <option value="manual_throw">Manual Throw</option>
-                        </select>
+                <div style="border: 1px solid var(--panel-border); border-radius: 12px; padding: 20px; margin-bottom: 20px; background: rgba(255, 255, 255, 0.02);">
+                    <h4 style="color: var(--primary); font-size: 0.95rem; margin-bottom: 15px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Movement & Throw Settings</h4>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="movement_throwtype">Throw Mouse Key</label>
+                            <select id="movement_throwtype" required>
+                                <option value="left">Left Click</option>
+                                <option value="right">Right Click</option>
+                                <option value="middle">Middle Click</option>
+                                <option value="none">None (Manual)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="movement_key">Movement Key</label>
+                            <select id="movement_key">
+                                <option value="">None</option>
+                                <option value="w">W (Forward)</option>
+                                <option value="a">A (Left)</option>
+                                <option value="s">S (Backward)</option>
+                                <option value="d">D (Right)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 15px; align-items: start;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <label for="movement_ticks" style="margin-bottom: 0;">Movement Duration</label>
+                                <div class="unit-toggle">
+                                    <span class="unit-btn active" data-unit="ticks">ticks</span>
+                                    <span class="unit-btn" data-unit="ms">ms</span>
+                                </div>
+                            </div>
+                            <input type="number" id="movement_ticks" value="0" min="0" step="1" required>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 0; display: flex; flex-direction: column;">
+                            <label style="visibility: hidden; margin-bottom: 8px;">Actions</label>
+                            <div style="display: flex; gap: 10px; width: 100%; justify-content: space-between; align-items: center; height: 46px;">
+                                <label class="toggle-badge" style="flex: 1; height: 100%; justify-content: center; align-items: center;">
+                                    <input type="checkbox" id="movement_jump"> Jump
+                                </label>
+                                <label class="toggle-badge" style="flex: 1; height: 100%; justify-content: center; align-items: center;">
+                                    <input type="checkbox" class="movement-modifier" value="crouch"> Crouch
+                                </label>
+                                <label class="toggle-badge" style="flex: 1; height: 100%; justify-content: center; align-items: center;">
+                                    <input type="checkbox" class="movement-modifier" value="shift"> Shift
+                                </label>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -577,8 +907,20 @@
 
         <div class="section-header">
             <h2 class="section-title">Saved Lineups</h2>
-            <button id="refresh-btn" class="auto-fill-btn" style="width: auto; padding: 6px 12px; font-size: 0.8rem;">↻
-                Reload</button>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <button id="export-btn" class="auto-fill-btn" style="width: auto; padding: 6px 12px; font-size: 0.8rem; background: var(--accent-purple); color: var(--accent-purple-text); border: 1px solid var(--accent-purple-border); display: none;">⇅ Export</button>
+                <button id="refresh-btn" class="auto-fill-btn" style="width: auto; padding: 6px 12px; font-size: 0.8rem;">↻ Reload</button>
+            </div>
+        </div>
+
+        <div id="offline-dropzone" style="display: none; border: 2px dashed var(--panel-border); border-radius: 12px; padding: 45px 20px; text-align: center; background: rgba(0, 0, 0, 0.2); cursor: pointer; transition: all 0.2s ease; margin-bottom: 25px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 40px; height: 40px; margin: 0 auto 12px; color: var(--accent-purple-text); display: block;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+            <span style="font-size: 0.9rem; color: var(--text-main); line-height: 1.6;">
+                server offline or database empty.<br>
+                drag & drop <code style="color: var(--accent-purple-text);">grenades.json</code> here, click to import, or 
+                <a id="download-cloud-link" style="color: var(--primary); text-decoration: underline; cursor: pointer; font-weight: 600;">click here to load cloud grenades</a>.
+            </span>
+            <input type="file" id="offline-file-input" style="display: none;" accept=".json">
         </div>
 
         <div id="visual-list">
@@ -586,8 +928,147 @@
         </div>
     </div>
 
+    <!-- Edit Modal -->
+    <div id="edit-modal" class="modal-backdrop">
+        <div class="glass-panel" style="width: 100%; max-width: 650px; max-height: 90vh; overflow-y: auto; margin-bottom: 0; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75); border: 1px solid var(--panel-border);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="font-size: 1.5rem; font-weight: 600; color: #fff; margin-bottom: 0; text-transform: lowercase;">edit_lineup.lua</h2>
+                <button type="button" id="close-modal-btn" style="background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 2rem; line-height: 1; padding: 0 5px;">&times;</button>
+            </div>
+            <form id="edit-lineup-form">
+                <div class="form-group">
+                    <label for="edit_map">Map Name</label>
+                    <input type="text" id="edit_map" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit_title">Lineup Title</label>
+                    <input type="text" id="edit_title" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit_description">Instructions / Description</label>
+                    <textarea id="edit_description" rows="2" placeholder="Where to stand, what to aim at..."></textarea>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 20px;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="edit_grenade_type">Grenade Type</label>
+                        <select id="edit_grenade_type" required>
+                            <option value="smoke_grenade">Smoke</option>
+                            <option value="flashbang">Flashbang</option>
+                            <option value="he_grenade">HE Grenade</option>
+                            <option value="molotov">Molotov</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="border: 1px solid var(--panel-border); border-radius: 12px; padding: 20px; margin-bottom: 20px; background: rgba(255, 255, 255, 0.02);">
+                    <h4 style="color: var(--primary); font-size: 0.95rem; margin-bottom: 15px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Movement & Throw Settings</h4>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="edit_movement_throwtype">Throw Mouse Key</label>
+                            <select id="edit_movement_throwtype" required>
+                                <option value="left">Left Click</option>
+                                <option value="right">Right Click</option>
+                                <option value="middle">Middle Click</option>
+                                <option value="none">None (Manual)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="edit_movement_key">Movement Key</label>
+                            <select id="edit_movement_key">
+                                <option value="">None</option>
+                                <option value="w">W (Forward)</option>
+                                <option value="a">A (Left)</option>
+                                <option value="s">S (Backward)</option>
+                                <option value="d">D (Right)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 15px; align-items: start;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <label for="edit_movement_ticks" style="margin-bottom: 0;">Movement Duration</label>
+                                <div class="unit-toggle">
+                                    <span class="unit-btn active" data-unit="ticks">ticks</span>
+                                    <span class="unit-btn" data-unit="ms">ms</span>
+                                </div>
+                            </div>
+                            <input type="number" id="edit_movement_ticks" value="0" min="0" step="1" required>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 0; display: flex; flex-direction: column;">
+                            <label style="visibility: hidden; margin-bottom: 8px;">Actions</label>
+                            <div style="display: flex; gap: 10px; width: 100%; justify-content: space-between; align-items: center; height: 46px;">
+                                <label class="toggle-badge" style="flex: 1; height: 100%; justify-content: center; align-items: center;">
+                                    <input type="checkbox" id="edit_movement_jump"> Jump
+                                </label>
+                                <label class="toggle-badge" style="flex: 1; height: 100%; justify-content: center; align-items: center;">
+                                    <input type="checkbox" class="edit-movement-modifier" value="crouch"> Crouch
+                                </label>
+                                <label class="toggle-badge" style="flex: 1; height: 100%; justify-content: center; align-items: center;">
+                                    <input type="checkbox" class="edit-movement-modifier" value="shift"> Shift
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label>View Angles</label>
+                        <div class="multi-input">
+                            <input type="number" step="any" id="edit_view_angle_x" placeholder="Pitch" required>
+                            <input type="number" step="any" id="edit_view_angle_y" placeholder="Yaw" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label>Position</label>
+                        <div style="display: flex; gap: 5px;">
+                            <input type="number" step="any" id="edit_pos_x" placeholder="X" required>
+                            <input type="number" step="any" id="edit_pos_y" placeholder="Y" required>
+                            <input type="number" step="any" id="edit_pos_z" placeholder="Z" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 15px; margin-top: 25px;">
+                    <button type="button" id="cancel-edit-btn" class="auto-fill-btn" style="flex: 1; margin-bottom: 0;">Cancel</button>
+                    <button type="submit" class="submit-btn" style="flex: 2; margin-top: 0;">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
-        const NODE_BASE = window.location.origin;
+        // Intercept programmatic select value changes to keep custom dropdown UI in sync
+        const selectDescriptor = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value');
+        const originalSelectValueGetter = selectDescriptor.get;
+        const originalSelectValueSetter = selectDescriptor.set;
+        Object.defineProperty(HTMLSelectElement.prototype, 'value', {
+            get: function() {
+                return originalSelectValueGetter.call(this);
+            },
+            set: function(val) {
+                const oldVal = originalSelectValueGetter.call(this);
+                originalSelectValueSetter.call(this, val);
+                if (oldVal !== val && !this._preventValueSync) {
+                    this._preventValueSync = true;
+                    try {
+                        this.dispatchEvent(new Event('change', { bubbles: true }));
+                    } finally {
+                        this._preventValueSync = false;
+                    }
+                }
+            }
+        });
+
+        const NODE_BASE = window.location.protocol.startsWith('http') ? window.location.origin : 'http://127.0.0.1:60388';
         let latestPlayerData = null;
         let currentGrenadeData = {};
 
@@ -599,6 +1080,280 @@
             const liveDot = document.getElementById('live-dot');
             const autoFillBtn = document.getElementById('auto-fill-btn');
             const refreshBtn = document.getElementById('refresh-btn');
+
+            // Initialize Custom Dropdowns
+            function initCustomSelects() {
+                const selects = document.querySelectorAll('select');
+                selects.forEach(select => {
+                    if (select.parentNode.classList.contains('custom-select-wrapper')) return;
+
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'custom-select-wrapper';
+                    select.parentNode.insertBefore(wrapper, select);
+                    wrapper.appendChild(select);
+                    select.style.display = 'none';
+
+                    const trigger = document.createElement('div');
+                    trigger.className = 'custom-select-trigger';
+                    wrapper.appendChild(trigger);
+
+                    const optionsContainer = document.createElement('div');
+                    optionsContainer.className = 'custom-select-options';
+                    wrapper.appendChild(optionsContainer);
+
+                    function buildOptions() {
+                        optionsContainer.innerHTML = '';
+                        Array.from(select.options).forEach(opt => {
+                            const optDiv = document.createElement('div');
+                            optDiv.className = 'custom-option';
+                            optDiv.textContent = opt.textContent;
+                            optDiv.dataset.value = opt.value;
+                            if (opt.selected) {
+                                optDiv.classList.add('selected');
+                                trigger.textContent = opt.textContent;
+                            }
+                            optDiv.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                select.value = opt.value;
+                                select.dispatchEvent(new Event('change', { bubbles: true }));
+                                optionsContainer.classList.remove('open');
+                                trigger.classList.remove('active');
+                            });
+                            optionsContainer.appendChild(optDiv);
+                        });
+                    }
+                    buildOptions();
+
+                    trigger.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        document.querySelectorAll('.custom-select-options.open').forEach(openContainer => {
+                            if (openContainer !== optionsContainer) {
+                                openContainer.classList.remove('open');
+                                openContainer.previousElementSibling.classList.remove('active');
+                            }
+                        });
+                        const isOpen = optionsContainer.classList.contains('open');
+                        optionsContainer.classList.toggle('open', !isOpen);
+                        trigger.classList.toggle('active', !isOpen);
+                    });
+
+                    function syncUI() {
+                        const val = select.value;
+                        let matched = false;
+                        Array.from(optionsContainer.children).forEach(optDiv => {
+                            if (optDiv.dataset.value === val) {
+                                optDiv.classList.add('selected');
+                                trigger.textContent = optDiv.textContent;
+                                matched = true;
+                            } else {
+                                optDiv.classList.remove('selected');
+                            }
+                        });
+                        if (!matched && select.options.length > 0) {
+                            trigger.textContent = select.options[0].textContent;
+                        }
+                    }
+
+                    select.addEventListener('change', syncUI);
+                    select.syncCustomSelect = syncUI;
+                });
+
+                document.addEventListener('click', () => {
+                    document.querySelectorAll('.custom-select-options.open').forEach(openContainer => {
+                        openContainer.classList.remove('open');
+                        openContainer.previousElementSibling.classList.remove('active');
+                    });
+                });
+            }
+
+            // Initialize Custom Number Inputs (Ticks)
+            function initCustomNumberInputs() {
+                const numberInputs = document.querySelectorAll('#movement_ticks, #edit_movement_ticks');
+                numberInputs.forEach(input => {
+                    if (input.parentNode.classList.contains('custom-number-wrapper')) return;
+
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'custom-number-wrapper';
+                    input.parentNode.insertBefore(wrapper, input);
+                    wrapper.appendChild(input);
+
+                    const btnContainer = document.createElement('div');
+                    btnContainer.className = 'custom-number-btn-container';
+
+                    const upBtn = document.createElement('div');
+                    upBtn.className = 'custom-number-btn up';
+                    upBtn.textContent = '▲';
+
+                    const downBtn = document.createElement('div');
+                    downBtn.className = 'custom-number-btn down';
+                    downBtn.textContent = '▼';
+
+                    btnContainer.appendChild(upBtn);
+                    btnContainer.appendChild(downBtn);
+                    wrapper.appendChild(btnContainer);
+
+                    let intervalId = null;
+                    let timeoutId = null;
+
+                    function adjust(amount) {
+                        let val = parseInt(input.value) || 0;
+                        const min = input.hasAttribute('min') ? parseInt(input.getAttribute('min')) : -Infinity;
+                        const max = input.hasAttribute('max') ? parseInt(input.getAttribute('max')) : Infinity;
+                        const step = input.hasAttribute('step') ? parseInt(input.getAttribute('step')) : 1;
+
+                        val += amount * step;
+                        if (val < min) val = min;
+                        if (val > max) val = max;
+
+                        input.value = val;
+                        input.dispatchEvent(new Event('input', { bubbles: true }));
+                        input.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+
+                    function startAutoAdjust(amount) {
+                        adjust(amount);
+                        timeoutId = setTimeout(() => {
+                            intervalId = setInterval(() => {
+                                adjust(amount);
+                            }, 80);
+                        }, 500);
+                    }
+
+                    function stopAutoAdjust() {
+                        if (timeoutId) clearTimeout(timeoutId);
+                        if (intervalId) clearInterval(intervalId);
+                    }
+
+                    upBtn.addEventListener('mousedown', (e) => {
+                        if (e.button !== 0) return;
+                        startAutoAdjust(1);
+                    });
+
+                    downBtn.addEventListener('mousedown', (e) => {
+                        if (e.button !== 0) return;
+                        startAutoAdjust(-1);
+                    });
+
+                    window.addEventListener('mouseup', stopAutoAdjust);
+
+                    // Touch events for mobile compatibility
+                    upBtn.addEventListener('touchstart', (e) => {
+                        e.preventDefault();
+                        startAutoAdjust(1);
+                    });
+                    upBtn.addEventListener('touchend', stopAutoAdjust);
+
+                    downBtn.addEventListener('touchstart', (e) => {
+                        e.preventDefault();
+                        startAutoAdjust(-1);
+                    });
+                    downBtn.addEventListener('touchend', stopAutoAdjust);
+                });
+            }
+
+            initCustomSelects();
+            initCustomNumberInputs();
+
+            // Make crouch and shift mutually exclusive in the creation form
+            const crouchCheckbox = document.querySelector('.movement-modifier[value="crouch"]');
+            const shiftCheckbox = document.querySelector('.movement-modifier[value="shift"]');
+            if (crouchCheckbox && shiftCheckbox) {
+                crouchCheckbox.addEventListener('change', () => {
+                    if (crouchCheckbox.checked) {
+                        shiftCheckbox.checked = false;
+                    }
+                });
+                shiftCheckbox.addEventListener('change', () => {
+                    if (shiftCheckbox.checked) {
+                        crouchCheckbox.checked = false;
+                    }
+                });
+            }
+
+            // Make crouch and shift mutually exclusive in the edit form
+            const editCrouchCheckbox = document.querySelector('.edit-movement-modifier[value="crouch"]');
+            const editShiftCheckbox = document.querySelector('.edit-movement-modifier[value="shift"]');
+            if (editCrouchCheckbox && editShiftCheckbox) {
+                editCrouchCheckbox.addEventListener('change', () => {
+                    if (editCrouchCheckbox.checked) {
+                        editShiftCheckbox.checked = false;
+                    }
+                });
+                editShiftCheckbox.addEventListener('change', () => {
+                    if (editShiftCheckbox.checked) {
+                        editCrouchCheckbox.checked = false;
+                    }
+                });
+            }
+
+            // Listen for form resets to sync custom selects
+            document.querySelectorAll('form').forEach(f => {
+                f.addEventListener('reset', () => {
+                    setTimeout(() => {
+                        f.querySelectorAll('select').forEach(sel => {
+                            if (sel.syncCustomSelect) sel.syncCustomSelect();
+                        });
+                    }, 0);
+                });
+            });
+
+            // Global preference for units: 'ticks' or 'ms'
+            let currentUnit = 'ticks';
+            const TICK_MS_CONVERSION = 15.625;
+
+            function setUnit(unit) {
+                if (currentUnit === unit) return;
+                
+                const oldUnit = currentUnit;
+                currentUnit = unit;
+
+                // Update UI toggles to active state
+                document.querySelectorAll('.unit-toggle').forEach(toggle => {
+                    toggle.querySelectorAll('.unit-btn').forEach(btn => {
+                        if (btn.dataset.unit === unit) {
+                            btn.classList.add('active');
+                        } else {
+                            btn.classList.remove('active');
+                        }
+                    });
+                });
+
+                // Update input values and step sizes
+                const creationInput = document.getElementById('movement_ticks');
+                const editInput = document.getElementById('edit_movement_ticks');
+
+                if (creationInput) {
+                    let val = parseInt(creationInput.value) || 0;
+                    if (unit === 'ms' && oldUnit === 'ticks') {
+                        creationInput.value = Math.round(val * TICK_MS_CONVERSION);
+                        creationInput.setAttribute('step', '16');
+                    } else if (unit === 'ticks' && oldUnit === 'ms') {
+                        creationInput.value = Math.round(val / TICK_MS_CONVERSION);
+                        creationInput.setAttribute('step', '1');
+                    }
+                }
+
+                if (editInput) {
+                    let val = parseInt(editInput.value) || 0;
+                    if (unit === 'ms' && oldUnit === 'ticks') {
+                        editInput.value = Math.round(val * TICK_MS_CONVERSION);
+                        editInput.setAttribute('step', '16');
+                    } else if (unit === 'ticks' && oldUnit === 'ms') {
+                        editInput.value = Math.round(val / TICK_MS_CONVERSION);
+                        editInput.setAttribute('step', '1');
+                    }
+                }
+            }
+
+            // Bind click events on all unit toggle elements
+            document.querySelectorAll('.unit-toggle').forEach(toggle => {
+                toggle.querySelectorAll('.unit-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        setUnit(btn.dataset.unit);
+                    });
+                });
+            });
 
             async function pollPlayerData() {
                 try {
@@ -640,9 +1395,7 @@
                 const d = latestPlayerData;
                 if (d.map) document.getElementById('map').value = d.map;
                 if (d.weapon) {
-                    const sel = document.getElementById('grenade_type');
-                    const opt = Array.from(sel.options).find(o => o.value === d.weapon);
-                    if (opt) opt.selected = true;
+                    document.getElementById('grenade_type').value = d.weapon;
                 }
                 if (d.angles) {
                     document.getElementById('view_angle_x').value = d.angles.x;
@@ -656,18 +1409,143 @@
                 showStatus(statusMsg, 'Live data captured!', 'success');
             });
 
+            let editingMap = null;
+            let editingIndex = null;
+
+            const editModal = document.getElementById('edit-modal');
+            const editForm = document.getElementById('edit-lineup-form');
+            const closeModalBtn = document.getElementById('close-modal-btn');
+            const cancelEditBtn = document.getElementById('cancel-edit-btn');
+
+            function openEditModal(mapName, index) {
+                editingMap = mapName;
+                editingIndex = index;
+                const nade = currentGrenadeData[mapName][index];
+
+                document.getElementById('edit_map').value = mapName;
+                document.getElementById('edit_title').value = nade.title;
+                document.getElementById('edit_description').value = nade.description || '';
+                document.getElementById('edit_grenade_type').value = nade.grenade_type;
+                
+                const mv = nade.movement || {};
+                document.getElementById('edit_movement_throwtype').value = mv.throwtype || 'left';
+                document.getElementById('edit_movement_key').value = mv.movement_key || '';
+                
+                const baseTicks = mv.movement_ticks || 0;
+                const editTicksInput = document.getElementById('edit_movement_ticks');
+                if (currentUnit === 'ms') {
+                    editTicksInput.value = Math.round(baseTicks * TICK_MS_CONVERSION);
+                    editTicksInput.setAttribute('step', '16');
+                } else {
+                    editTicksInput.value = baseTicks;
+                    editTicksInput.setAttribute('step', '1');
+                }
+                document.getElementById('edit_movement_jump').checked = !!mv.jump;
+
+                const modifiers = mv.modifiers || [];
+                document.querySelectorAll('.edit-movement-modifier').forEach(checkbox => {
+                    checkbox.checked = modifiers.includes(checkbox.value);
+                });
+
+                document.getElementById('edit_view_angle_x').value = nade.view_angle ? nade.view_angle.x : 0;
+                document.getElementById('edit_view_angle_y').value = nade.view_angle ? nade.view_angle.y : 0;
+                document.getElementById('edit_pos_x').value = nade.position ? nade.position.x : 0;
+                document.getElementById('edit_pos_y').value = nade.position ? nade.position.y : 0;
+                document.getElementById('edit_pos_z').value = nade.position ? nade.position.z : 0;
+
+                editModal.style.display = 'flex';
+                setTimeout(() => editModal.classList.add('open'), 10);
+            }
+
+            function closeEditModal() {
+                editModal.classList.remove('open');
+                setTimeout(() => editModal.style.display = 'none', 300);
+                editingMap = null;
+                editingIndex = null;
+            }
+
+            closeModalBtn.addEventListener('click', closeEditModal);
+            cancelEditBtn.addEventListener('click', closeEditModal);
+            editModal.addEventListener('click', (e) => {
+                if (e.target === editModal) closeEditModal();
+            });
+
+            editForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if (editingMap === null || editingIndex === null) return;
+
+                const newMap = document.getElementById('edit_map').value.trim();
+                const rawTicksVal = parseInt(document.getElementById('edit_movement_ticks').value) || 0;
+                const finalTicksVal = currentUnit === 'ms' ? Math.round(rawTicksVal / TICK_MS_CONVERSION) : rawTicksVal;
+
+                const updatedNade = {
+                    grenade_type: document.getElementById('edit_grenade_type').value,
+                    title: document.getElementById('edit_title').value.trim(),
+                    description: document.getElementById('edit_description').value.trim(),
+                    movement: {
+                        throwtype: document.getElementById('edit_movement_throwtype').value,
+                        modifiers: Array.from(document.querySelectorAll('.edit-movement-modifier:checked')).map(el => el.value),
+                        movement_key: document.getElementById('edit_movement_key').value || null,
+                        movement_ticks: finalTicksVal,
+                        jump: document.getElementById('edit_movement_jump').checked
+                    },
+                    view_angle: {
+                        x: parseFloat(document.getElementById('edit_view_angle_x').value),
+                        y: parseFloat(document.getElementById('edit_view_angle_y').value)
+                    },
+                    position: {
+                        x: parseFloat(document.getElementById('edit_pos_x').value),
+                        y: parseFloat(document.getElementById('edit_pos_y').value),
+                        z: parseFloat(document.getElementById('edit_pos_z').value)
+                    }
+                };
+
+                if (newMap === editingMap) {
+                    currentGrenadeData[editingMap][editingIndex] = updatedNade;
+                } else {
+                    currentGrenadeData[editingMap].splice(editingIndex, 1);
+                    if (currentGrenadeData[editingMap].length === 0) {
+                        delete currentGrenadeData[editingMap];
+                    }
+                    if (!currentGrenadeData[newMap]) {
+                        currentGrenadeData[newMap] = [];
+                    }
+                    currentGrenadeData[newMap].push(updatedNade);
+                }
+
+                const success = await saveToServer(currentGrenadeData);
+                if (success) {
+                    closeEditModal();
+                    renderVisualList(currentGrenadeData);
+                    showStatus(statusMsg, 'Lineup updated successfully!', 'success');
+                } else {
+                    closeEditModal();
+                    renderVisualList(currentGrenadeData);
+                    showStatus(statusMsg, 'Updated locally! (Server offline - Export to save)', 'success');
+                }
+            });
+
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const saveBtn = document.getElementById('save-btn');
                 saveBtn.disabled = true;
                 saveBtn.textContent = 'Saving...';
 
+                const rawTicksVal = parseInt(document.getElementById('movement_ticks').value) || 0;
+                const finalTicksVal = currentUnit === 'ms' ? Math.round(rawTicksVal / TICK_MS_CONVERSION) : rawTicksVal;
+
                 const payload = {
-                    map: document.getElementById('map').value,
+                    map: document.getElementById('map').value.trim(),
                     grenade_type: document.getElementById('grenade_type').value,
-                    title: document.getElementById('title').value,
-                    description: document.getElementById('description').value || "",
-                    throw_type: document.getElementById('throw_type').value,
+                    title: document.getElementById('title').value.trim(),
+                    description: document.getElementById('description').value.trim() || "",
+                    movement: {
+                        throwtype: document.getElementById('movement_throwtype').value,
+                        modifiers: Array.from(document.querySelectorAll('.movement-modifier:checked')).map(el => el.value),
+                        movement_key: document.getElementById('movement_key').value || null,
+                        movement_ticks: finalTicksVal,
+                        jump: document.getElementById('movement_jump').checked
+                    },
                     view_angle: {
                         x: parseFloat(document.getElementById('view_angle_x').value),
                         y: parseFloat(document.getElementById('view_angle_y').value)
@@ -680,6 +1558,9 @@
                 };
 
                 try {
+                    if (isOffline) {
+                        throw new Error("Offline Mode");
+                    }
                     const res = await fetch(`${NODE_BASE}/?action=save`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -689,31 +1570,192 @@
                     if (res.ok) {
                         showStatus(statusMsg, 'Lineup saved!', 'success');
                         form.reset();
-                        loadJSON(); // Refresh list
+                        loadJSON(); 
                     } else {
                         showStatus(statusMsg, 'Save failed.', 'error');
                     }
                 } catch (err) {
-                    showStatus(statusMsg, 'Server error.', 'error');
+                    // Local save fallback
+                    const mapName = payload.map;
+                    const cleanPayload = Object.assign({}, payload);
+                    delete cleanPayload.map;
+                    if (!currentGrenadeData[mapName]) {
+                        currentGrenadeData[mapName] = [];
+                    }
+                    currentGrenadeData[mapName].push(cleanPayload);
+                    renderVisualList(currentGrenadeData);
+                    showStatus(statusMsg, 'Saved locally! (Server offline - Export to save)', 'success');
+                    form.reset();
                 } finally {
                     saveBtn.disabled = false;
                     saveBtn.textContent = 'Save Lineup';
                 }
             });
 
+            function getMovementLabel(movement) {
+                if (!movement) return 'NONE';
+                let parts = [];
+                if (movement.throwtype && movement.throwtype !== 'none') {
+                    parts.push(movement.throwtype.toUpperCase() + ' CLICK');
+                }
+                if (movement.modifiers && movement.modifiers.length > 0) {
+                    movement.modifiers.forEach(mod => parts.push(mod.toUpperCase()));
+                }
+                if (movement.movement_key) {
+                    parts.push(movement.movement_key.toUpperCase());
+                }
+                if (movement.jump) {
+                    parts.push('JUMP');
+                }
+                return parts.length > 0 ? parts.join(' + ') : 'MANUAL';
+            }
+
+            let isOffline = false;
+
             async function loadJSON() {
                 try {
+                    // Try targeting server API first
                     const res = await fetch(`${NODE_BASE}/?action=load`);
+                    if (!res.ok) {
+                        throw new Error(`Server returned HTTP ${res.status}`);
+                    }
                     currentGrenadeData = await res.json();
+                    isOffline = false;
+                    document.getElementById('offline-dropzone').style.display = 'none';
+                    document.getElementById('export-btn').style.display = 'none';
                     renderVisualList(currentGrenadeData);
                 } catch (err) {
-                    visualList.innerHTML = '<p class="error">Failed to load lineups.</p>';
+                    console.warn("API server loading failed, trying fallback static file fetch...", err);
+                    try {
+                        // Try loading static file relative path (useful if using static webserver)
+                        const res = await fetch('grenades.json');
+                        if (!res.ok) {
+                            throw new Error(`Fallback HTTP ${res.status}`);
+                        }
+                        currentGrenadeData = await res.json();
+                        isOffline = true;
+                        document.getElementById('offline-dropzone').style.display = 'none';
+                        document.getElementById('export-btn').style.display = 'inline-block';
+                        renderVisualList(currentGrenadeData);
+                    } catch (fallbackErr) {
+                        console.error("All auto-loading attempts failed. Running offline drag & drop import.", fallbackErr);
+                        isOffline = true;
+                        document.getElementById('export-btn').style.display = 'inline-block';
+                        renderVisualList(currentGrenadeData);
+                    }
                 }
             }
             loadJSON();
             refreshBtn.addEventListener('click', loadJSON);
 
+            // Download Cloud Grenades
+            const downloadCloudLink = document.getElementById('download-cloud-link');
+            if (downloadCloudLink) {
+                let isDownloading = false;
+                downloadCloudLink.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (isDownloading) return;
+                    isDownloading = true;
+                    downloadCloudLink.textContent = 'downloading...';
+                    downloadCloudLink.style.pointerEvents = 'none';
+                    try {
+                        const cloudUrl = 'https://bunnyware.fun/grenades.json';
+                        const res = await fetch(cloudUrl);
+                        if (!res.ok) {
+                            throw new Error(`Failed to fetch cloud lineups (HTTP ${res.status})`);
+                        }
+                        const parsed = await res.json();
+                        if (typeof parsed !== 'object' || Array.isArray(parsed)) {
+                            throw new Error("Invalid format: cloud JSON root must be a dictionary.");
+                        }
+                        currentGrenadeData = parsed;
+                        
+                        // Try saving to server if online
+                        const saved = await saveToServer(currentGrenadeData);
+                        if (saved) {
+                            showStatus(statusMsg, 'Cloud lineups downloaded and saved to database!', 'success');
+                        } else {
+                            showStatus(statusMsg, 'Cloud lineups loaded locally! (Server offline - Export to save)', 'success');
+                        }
+                        
+                        renderVisualList(currentGrenadeData);
+                    } catch (err) {
+                        alert("Error downloading cloud lineups: " + err.message);
+                    } finally {
+                        isDownloading = false;
+                        downloadCloudLink.textContent = 'click here to load cloud grenades';
+                        downloadCloudLink.style.pointerEvents = 'auto';
+                    }
+                });
+            }
+
+            // Export local data
+            const exportBtn = document.getElementById('export-btn');
+            exportBtn.addEventListener('click', () => {
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(currentGrenadeData, null, 4));
+                const downloadAnchor = document.createElement('a');
+                downloadAnchor.setAttribute("href", dataStr);
+                downloadAnchor.setAttribute("download", "grenades.json");
+                document.body.appendChild(downloadAnchor);
+                downloadAnchor.click();
+                downloadAnchor.remove();
+                showStatus(statusMsg, 'Exported grenades.json!', 'success');
+            });
+
+            // Offline Dropzone / Upload logic
+            const dropzone = document.getElementById('offline-dropzone');
+            const fileInput = document.getElementById('offline-file-input');
+
+            dropzone.addEventListener('click', () => fileInput.click());
+
+            dropzone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropzone.style.borderColor = 'var(--accent-purple-border)';
+                dropzone.style.background = 'rgba(155, 102, 255, 0.05)';
+            });
+
+            dropzone.addEventListener('dragleave', () => {
+                dropzone.style.borderColor = 'var(--panel-border)';
+                dropzone.style.background = 'rgba(0, 0, 0, 0.2)';
+            });
+
+            dropzone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropzone.style.borderColor = 'var(--panel-border)';
+                dropzone.style.background = 'rgba(0, 0, 0, 0.2)';
+                if (e.dataTransfer.files.length > 0) {
+                    handleImportFile(e.dataTransfer.files[0]);
+                }
+            });
+
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    handleImportFile(e.target.files[0]);
+                }
+            });
+
+            function handleImportFile(file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const parsed = JSON.parse(event.target.result);
+                        if (typeof parsed !== 'object' || Array.isArray(parsed)) {
+                            throw new Error("JSON root must be a dictionary of maps.");
+                        }
+                        currentGrenadeData = parsed;
+                        renderVisualList(currentGrenadeData);
+                        dropzone.style.display = 'none';
+                        showStatus(statusMsg, 'Imported grenades.json successfully!', 'success');
+                    } catch (e) {
+                        alert("Invalid grenades.json: " + e.message);
+                    }
+                };
+                reader.readAsText(file);
+            }
+
             async function saveToServer(data) {
+                if (isOffline) return false;
                 try {
                     const res = await fetch(`${NODE_BASE}/?action=save_raw`, {
                         method: 'POST',
@@ -737,8 +1779,10 @@
                 const success = await saveToServer(currentGrenadeData);
                 if (success) {
                     renderVisualList(currentGrenadeData);
+                    showStatus(statusMsg, 'Lineup deleted successfully!', 'success');
                 } else {
-                    alert('Delete failed on server.');
+                    renderVisualList(currentGrenadeData);
+                    showStatus(statusMsg, 'Deleted locally! (Server offline - Export to save)', 'success');
                 }
             }
 
@@ -752,10 +1796,16 @@
 
             function renderVisualList(data) {
                 visualList.innerHTML = '';
+                const dropzone = document.getElementById('offline-dropzone');
+
                 if (!data || Object.keys(data).length === 0) {
-                    visualList.innerHTML = '<p style="color:var(--text-muted); text-align:center; padding: 40px; background: rgba(0,0,0,0.2); border-radius: 16px;">No lineups saved yet.</p>';
+                    if (dropzone) {
+                        dropzone.style.display = 'block';
+                    }
                     return;
                 }
+
+                if (dropzone) dropzone.style.display = 'none';
 
                 for (const [mapName, nades] of Object.entries(data)) {
                     const mapCat = document.createElement('div');
@@ -766,7 +1816,10 @@
                     header.className = 'map-header';
                     header.innerHTML = `
                     <span class="map-title">${mapName}</span>
-                    <span class="map-count">${nades.length}</span>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <span class="map-count">${nades.length}</span>
+                        <span class="map-chevron">▼</span>
+                    </div>
                 `;
                     header.onclick = () => mapCat.classList.toggle('open');
 
@@ -778,18 +1831,24 @@
                         const card = document.createElement('div');
                         card.className = 'nade-card';
                         card.innerHTML = `
-                        <button class="delete-btn" title="Delete">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                        </button>
+                        <div class="nade-actions">
+                            <button class="edit-btn" title="Edit">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                            </button>
+                            <button class="delete-btn" title="Delete">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                            </button>
+                        </div>
                         <div class="nade-header">
                             <div class="nade-title">${iconSvg}${nade.title}</div>
                             <div class="nade-type">${nade.grenade_type.replace('_', ' ')}</div>
                         </div>
-                        <div class="nade-desc">${nade.description || "No description provided."}</div>
+                        <div class="nade-desc">"${nade.description || "no description provided."}"</div>
                         <div class="nade-details">
-                            <div class="detail-item"><strong>Throw Type</strong><span>${nade.throw_type.replace(/_/g, ' ')}</span></div>
-                            <div class="detail-item"><strong>Angles (X, Y)</strong><span>${nade.view_angle.x.toFixed(2)}, ${nade.view_angle.y.toFixed(2)}</span></div>
-                            <div class="detail-item" style="grid-column: span 2"><strong>Position (X, Y, Z)</strong><span>${nade.position.x.toFixed(1)}, ${nade.position.y.toFixed(1)}, ${nade.position.z.toFixed(1)}</span></div>
+                            <div class="detail-item"><strong>Movement Sequence</strong><span>${getMovementLabel(nade.movement)}</span></div>
+                            <div class="detail-item"><strong>Ticks</strong><span>${nade.movement ? (nade.movement.movement_ticks || 0) : 0}</span></div>
+                            <div class="detail-item"><strong>Angles (X, Y)</strong><span>${nade.view_angle ? nade.view_angle.x.toFixed(2) : 0.00}, ${nade.view_angle ? nade.view_angle.y.toFixed(2) : 0.00}</span></div>
+                            <div class="detail-item"><strong>Position (X, Y, Z)</strong><span>${nade.position ? nade.position.x.toFixed(1) : 0.0}, ${nade.position ? nade.position.y.toFixed(1) : 0.0}, ${nade.position ? nade.position.z.toFixed(1) : 0.0}</span></div>
                         </div>
                     `;
 
@@ -798,11 +1857,20 @@
                             deleteNade(mapName, idx);
                         };
 
+                        card.querySelector('.edit-btn').onclick = (e) => {
+                            e.stopPropagation();
+                            openEditModal(mapName, idx);
+                        };
+
                         content.appendChild(card);
                     });
 
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'map-content-wrapper';
+                    wrapper.appendChild(content);
+
                     mapCat.appendChild(header);
-                    mapCat.appendChild(content);
+                    mapCat.appendChild(wrapper);
                     visualList.appendChild(mapCat);
                 }
             }

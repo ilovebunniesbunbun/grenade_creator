@@ -8,6 +8,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const jsonStatusMsg = document.getElementById('json-status-message');
     const visualList = document.getElementById('visual-list');
 
+    // Global preference for units: 'ticks' or 'ms'
+    let currentUnit = 'ticks';
+    const TICK_MS_CONVERSION = 15.625;
+
     // Tab Switching
     tabs.forEach(tab => {
         tab.addEventListener('click', () => {
@@ -28,12 +32,21 @@ document.addEventListener('DOMContentLoaded', () => {
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         
+        const rawTicksVal = parseInt(document.getElementById('movement_ticks').value) || 0;
+        const finalTicksVal = currentUnit === 'ms' ? Math.round(rawTicksVal / TICK_MS_CONVERSION) : rawTicksVal;
+
         const payload = {
             map: document.getElementById('map').value,
             grenade_type: document.getElementById('grenade_type').value,
             title: document.getElementById('title').value,
             description: document.getElementById('description').value,
-            throw_type: document.getElementById('throw_type').value,
+            movement: {
+                throwtype: document.getElementById('movement_throwtype').value,
+                modifiers: Array.from(document.querySelectorAll('.movement-modifier:checked')).map(el => el.value),
+                movement_key: document.getElementById('movement_key').value || null,
+                movement_ticks: finalTicksVal,
+                jump: document.getElementById('movement_jump').checked
+            },
             view_angle: {
                 x: parseFloat(document.getElementById('view_angle_x').value),
                 y: parseFloat(document.getElementById('view_angle_y').value)
@@ -122,9 +135,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <div class="nade-desc">${nade.description}</div>
                     <div class="nade-details">
-                        <div class="detail-item">Throw: <span>${nade.throw_type.replace(/_/g, ' ')}</span></div>
-                        <div class="detail-item">Angles: <span>${nade.view_angle.x}, ${nade.view_angle.y}</span></div>
-                        <div class="detail-item" style="grid-column: span 2">Pos: <span>${nade.position.x}, ${nade.position.y}, ${nade.position.z}</span></div>
+                        <div class="detail-item">Movement: <span>${getMovementLabel(nade.movement)}</span></div>
+                        <div class="detail-item">Angles: <span>${nade.view_angle ? nade.view_angle.x : 0}, ${nade.view_angle ? nade.view_angle.y : 0}</span></div>
+                        <div class="detail-item" style="grid-column: span 2">Pos: <span>${nade.position ? nade.position.x : 0}, ${nade.position ? nade.position.y : 0}, ${nade.position ? nade.position.z : 0}</span></div>
                     </div>
                 `;
                 mapSection.appendChild(card);
@@ -132,6 +145,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
             visualList.appendChild(mapSection);
         }
+    }
+
+    function getMovementLabel(movement) {
+        if (!movement) return 'NONE';
+        let parts = [];
+        if (movement.throwtype && movement.throwtype !== 'none') {
+            parts.push(movement.throwtype.toUpperCase() + ' CLICK');
+        }
+        if (movement.modifiers && movement.modifiers.length > 0) {
+            movement.modifiers.forEach(mod => parts.push(mod.toUpperCase()));
+        }
+        if (movement.movement_key) {
+            parts.push(movement.movement_key.toUpperCase() + ` (${movement.movement_ticks || 0} ticks)`);
+        }
+        if (movement.jump) {
+            parts.push('JUMP');
+        }
+        return parts.length > 0 ? parts.join(' + ') : 'MANUAL';
     }
 
     function showStatus(elem, msg, type) {
@@ -174,4 +205,74 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // Make crouch and shift mutually exclusive in the creation form
+    const crouchCheckbox = document.querySelector('.movement-modifier[value="crouch"]');
+    const shiftCheckbox = document.querySelector('.movement-modifier[value="shift"]');
+    if (crouchCheckbox && shiftCheckbox) {
+        crouchCheckbox.addEventListener('change', () => {
+            if (crouchCheckbox.checked) {
+                shiftCheckbox.checked = false;
+            }
+        });
+        shiftCheckbox.addEventListener('change', () => {
+            if (shiftCheckbox.checked) {
+                crouchCheckbox.checked = false;
+            }
+        });
+    }
+
+    function setUnit(unit) {
+        if (currentUnit === unit) return;
+        
+        const oldUnit = currentUnit;
+        currentUnit = unit;
+
+        // Update UI toggles to active state
+        document.querySelectorAll('.unit-toggle').forEach(toggle => {
+            toggle.querySelectorAll('.unit-btn').forEach(btn => {
+                if (btn.dataset.unit === unit) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        });
+
+        // Update input values and step sizes
+        const creationInput = document.getElementById('movement_ticks');
+        const editInput = document.getElementById('edit_movement_ticks');
+
+        if (creationInput) {
+            let val = parseInt(creationInput.value) || 0;
+            if (unit === 'ms' && oldUnit === 'ticks') {
+                creationInput.value = Math.round(val * TICK_MS_CONVERSION);
+                creationInput.setAttribute('step', '16');
+            } else if (unit === 'ticks' && oldUnit === 'ms') {
+                creationInput.value = Math.round(val / TICK_MS_CONVERSION);
+                creationInput.setAttribute('step', '1');
+            }
+        }
+
+        if (editInput) {
+            let val = parseInt(editInput.value) || 0;
+            if (unit === 'ms' && oldUnit === 'ticks') {
+                editInput.value = Math.round(val * TICK_MS_CONVERSION);
+                editInput.setAttribute('step', '16');
+            } else if (unit === 'ticks' && oldUnit === 'ms') {
+                editInput.value = Math.round(val / TICK_MS_CONVERSION);
+                editInput.setAttribute('step', '1');
+            }
+        }
+    }
+
+    // Bind click events on all unit toggle elements
+    document.querySelectorAll('.unit-toggle').forEach(toggle => {
+        toggle.querySelectorAll('.unit-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                setUnit(btn.dataset.unit);
+            });
+        });
+    });
 });
